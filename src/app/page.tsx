@@ -1,103 +1,143 @@
-import Image from "next/image";
+"use client";
+import { useState, useEffect, useCallback } from "react";
 
-export default function Home() {
+const ITEMS_PER_PAGE = 5;
+
+interface DataItem {
+  id: number;
+  name: string;
+  email: string;
+}
+
+export default function DataTable() {
+  const [data, setData] = useState<DataItem[]>([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    setLoading(true);
+    fetch("https://intern.theassistech.co.th/exam/1")
+      .then((res) => {
+        if (!res.ok) throw new Error("Network response was not ok");
+        return res.json();
+      })
+      .then((data: DataItem[]) => {
+        if (Array.isArray(data)) setData(data);
+        else throw new Error("Data is not an array");
+      })
+      .catch((error) => setError(error.message))
+      .finally(() => setLoading(false));
+  }, []);
+
+  const totalPages = Math.ceil(data.length / ITEMS_PER_PAGE);
+  const paginatedData = data.slice(
+    (currentPage - 1) * ITEMS_PER_PAGE,
+    currentPage * ITEMS_PER_PAGE
+  );
+
+  const emptyRows = Array(ITEMS_PER_PAGE - paginatedData.length).fill({
+    id: "-",
+    name: "-",
+    email: "-",
+  });
+
+  const finalData = paginatedData.concat(emptyRows);
+
+  const changePage = useCallback((page: number) => {
+    if (page >= 1 && page <= totalPages) {
+      setCurrentPage(page);
+    }
+  }, [totalPages]);
+
   return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm/6 text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-[family-name:var(--font-geist-mono)] font-semibold">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
+    <div className="max-w-4xl mx-auto p-8">
+      <h1 className="text-5xl font-semibold mb-8 text-center text-gray-900 tracking-tight">
+        Data Table
+      </h1>
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
-        </div>
-      </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
+      {loading ? (
+        <div className="text-center text-gray-500 text-xl">กำลังโหลดข้อมูล...</div>
+      ) : error ? (
+        <div className="text-red-500 text-center text-lg">Error: {error}</div>
+      ) : (
+        <>
+          <div className="bg-white shadow-2xl rounded-3xl overflow-hidden border border-gray-200">
+            <table className="w-full border-collapse">
+              <thead>
+                <tr className="bg-gradient-to-r from-gray-100 to-gray-200 text-gray-700 text-lg font-medium">
+                  <th className="p-6 text-left">ID</th>
+                  <th className="p-6 text-left">Name</th>
+                  <th className="p-6 text-left">Email</th>
+                </tr>
+              </thead>
+              <tbody className="transition-all duration-500">
+                {finalData.map((item, index) => (
+                  <tr
+                  key={index}
+                  className={`transition-all duration-300 hover:bg-gray-50 ${
+                    index % 2 === 0 ? "bg-gray-50" : "bg-white"
+                  } hover:transform hover:scale-103 hover:bg-gray-100 hover:shadow-lg hover:z-10 hover:cursor-pointer transition-all duration-300`} 
+                >
+                  <td className="p-6 text-gray-900">{item.id}</td>
+                  <td className="p-6 text-gray-700">{item.name}</td>
+                  <td className="p-6 text-gray-500">{item.email}</td>
+                </tr>
+                
+                ))}
+              </tbody>
+            </table>
+          </div>
+
+          <div className="flex justify-center mt-8 space-x-3">
+            <button
+              className="px-7 py-3 bg-gray-900 text-white rounded-full shadow-lg hover:scale-105 hover:bg-gray-700 transition-all duration-300 disabled:opacity-50 "
+              onClick={() => changePage(1)}
+              disabled={currentPage === 1}
+            >
+              หน้าแรก
+            </button>
+
+            <button
+              className="px-7 py-3 bg-gray-900 text-white rounded-full shadow-lg hover:scale-105 hover:bg-gray-700 transition-all duration-300 disabled:opacity-50"
+              onClick={() => changePage(currentPage - 1)}
+              disabled={currentPage === 1}
+            >
+              ก่อนหน้า
+            </button>
+
+            {Array.from({ length: totalPages }, (_, index) => (
+              <button
+                key={index}
+                className={`px-7 py-3 text-lg font-medium rounded-full transition-all duration-300 shadow-lg hover:scale-105 ${
+                  currentPage === index + 1
+                    ? "bg-gray-900 text-white"
+                    : "bg-gray-200 text-gray-700 hover:bg-gray-300 "
+                }`}
+                onClick={() => changePage(index + 1)}
+              >
+                {index + 1}
+              </button>
+            ))}
+
+            <button
+              className="px-7 py-3 bg-gray-900 text-white rounded-full shadow-lg hover:scale-105 hover:bg-gray-700 transition-all duration-300 disabled:opacity-50"
+              onClick={() => changePage(currentPage + 1)}
+              disabled={currentPage === totalPages}
+            >
+              ถัดไป
+            </button>
+
+            <button
+              className="px-7 py-3 bg-gray-900 text-white rounded-full shadow-lg hover:scale-105 hover:bg-gray-700 transition-all duration-300 disabled:opacity-50"
+              onClick={() => changePage(totalPages)}
+              disabled={currentPage === totalPages}
+            >
+              หน้าสุดท้าย
+            </button>
+          </div>
+        </>
+      )}
     </div>
   );
 }
