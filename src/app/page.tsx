@@ -8,8 +8,6 @@ interface DataItem {
   name: string;
   email: string;
 }
-//hello
-// test git
 export default function DataTable() {
   const [data, setData] = useState<DataItem[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
@@ -63,8 +61,8 @@ export default function DataTable() {
         <div className="text-red-500 text-center text-lg">Error: {error}</div>
       ) : (
         <>
-          <div className="bg-white shadow-2xl rounded-3xl overflow-hidden border border-gray-200">
-            <table className="w-full border-collapse">
+          <div className="bg-white shadow-2xl rounded-3xl overflow-hidden border border-gray-200 ">
+            <table className="w-full border-collapse table-auto">
               <thead>
                 <tr className="bg-gradient-to-r from-gray-100 to-gray-200 text-gray-700 text-lg font-medium">
                   <th className="p-6 text-left">ID</th>
@@ -78,7 +76,7 @@ export default function DataTable() {
                   key={index}
                   className={`transition-all duration-300 hover:bg-gray-50 ${
                     index % 2 === 0 ? "bg-gray-50" : "bg-white"
-                  } hover:transform hover:scale-103 hover:bg-gray-100 hover:shadow-lg hover:z-10 hover:cursor-pointer transition-all duration-300`} 
+                  } hover:transform hover:scale-103 hover:bg-gray-100 hover:shadow-lg hover:z-10  transition-all duration-300`} 
                 >
                   <td className="p-6 text-gray-900">{item.id}</td>
                   <td className="p-6 text-gray-700">{item.name}</td>
@@ -90,7 +88,7 @@ export default function DataTable() {
             </table>
           </div>
 
-          <div className="flex justify-center mt-8 space-x-3">
+          <div className="flex justify-center mt-8 space-x-4 drop-shadow-xl ">
             <button
               className="px-7 py-3 bg-gray-900 text-white rounded-full shadow-lg hover:scale-105 hover:bg-gray-700 transition-all duration-300 disabled:opacity-50 "
               onClick={() => changePage(1)}
@@ -110,10 +108,10 @@ export default function DataTable() {
             {Array.from({ length: totalPages }, (_, index) => (
               <button
                 key={index}
-                className={`px-7 py-3 text-lg font-medium rounded-full transition-all duration-300 shadow-lg hover:scale-105 ${
+                className={`px-6 py-3 text-lg font-medium rounded-full transition-all duration-300 shadow-lg hover:scale-105 hover:cursor-pointer ${
                   currentPage === index + 1
-                    ? "bg-gray-900 text-white"
-                    : "bg-gray-200 text-gray-700 hover:bg-gray-300 "
+                    ? "bg-gray-900 text-white basis-30 p-4 text-center "
+                    : "bg-gray-200 text-gray-700 hover:bg-gray-300   "
                 }`}
                 onClick={() => changePage(index + 1)}
               >
