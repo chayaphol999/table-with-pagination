@@ -3,11 +3,12 @@ import { useState, useEffect, useCallback } from "react";
 
 const ITEMS_PER_PAGE = 5;
 
-interface DataItem {
+interface DataItem { 
   id: number;
   name: string;
   email: string;
 }
+//hello girhub
 export default function DataTable() {
   const [data, setData] = useState<DataItem[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
@@ -16,7 +17,7 @@ export default function DataTable() {
 
   useEffect(() => {
     setLoading(true);
-    fetch("https://intern.theassistech.co.th/exam/1")
+    fetch("https://intern.theassistech.co.th/exam/1")//apiUrl ที่ให้มา ใช้ fetch ดึงข้อมูล อยู่ตรงนี้ครับ 
       .then((res) => {
         if (!res.ok) throw new Error("Network response was not ok");
         return res.json();
@@ -35,7 +36,7 @@ export default function DataTable() {
     currentPage * ITEMS_PER_PAGE
   );
 
-  const emptyRows = Array(ITEMS_PER_PAGE - paginatedData.length).fill({
+  const emptyRows = Array(ITEMS_PER_PAGE - paginatedData.length).fill({ 
     id: "-",
     name: "-",
     email: "-",
@@ -49,7 +50,7 @@ export default function DataTable() {
     }
   }, [totalPages]);
 
-  return (
+  return ( 
     <div className="max-w-4xl mx-auto p-8">
       <h1 className="text-5xl font-semibold mb-8 text-center text-gray-900 tracking-tight">
         Data Table
