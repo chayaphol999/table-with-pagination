@@ -29,7 +29,7 @@ export default function DataTable() {
       .catch((error) => setError(error.message))
       .finally(() => setLoading(false));
   }, []);
-
+ //hello world
   const totalPages = Math.ceil(data.length / ITEMS_PER_PAGE);
   const paginatedData = data.slice(
     (currentPage - 1) * ITEMS_PER_PAGE,
